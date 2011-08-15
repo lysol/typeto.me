@@ -5,4 +5,14 @@
     <input name="join-token" type="text" placeholder="Join Token" />
     <button id="join-submit">Join</button>
     </form>
+    <% if @activeRooms? and @activeRooms.length > 0: %>
+    <div id="current-rooms">
+        Rooms ready for a partner:
+        <ul>
+            <% for room in @activeRooms: %>
+            <li><a href="/room/<%= room.token %>"><%= room.token %></a></li>
+            <% end %>
+        </ul>
+    </div>
+    <% end %>
 </div>

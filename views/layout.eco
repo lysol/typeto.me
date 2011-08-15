@@ -240,7 +240,10 @@
             margin: auto;
             margin-top: 5em;
             width: 20em;
-            height: 10em;
+        }
+        
+        #current-rooms {
+            margin-top: 2em;
         }
     </style>
   </head>

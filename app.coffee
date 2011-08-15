@@ -22,6 +22,13 @@ getRoom = (token) ->
     if room.token == token
       return room
 
+activeRooms = ->
+  erooms = []
+  for room in rooms
+    if room? and room.token? and (not room.top? or not room.bottom?)
+      erooms.push room
+  erooms
+
 roomRoute = (event, data, user) ->
   room = getRoom data.token
   if not room?
@@ -54,8 +61,10 @@ app.get '/', (request, response) ->
     token = request.query['join-token']
     response.redirect("http://#{config.publicHost}/room/#{token}", 303)
     return
+  currentRooms = activeRooms()
   response.render 'home',
     "config": config
+    "activeRooms": currentRooms
 
 app.get '/room/:token', (request, response) ->
   token = request.params.token
