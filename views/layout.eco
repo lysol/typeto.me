@@ -20,7 +20,6 @@
 
         $.prototype.setBoxColor = (color) ->
           prop = backgroundColor: color
-          console.log "Setting #{@} to #{color}"
           @animate prop, 200
 
         sendBuffer = ->
@@ -42,7 +41,6 @@
             osb = ($ '#other-scrollback')
             osb.empty()
             waitingfor = false
-          console.log osb 
           insertNotice 'User connected.'
           sendBuffer()
 
@@ -59,26 +57,20 @@
           '''
 
         insertNotice = (message) ->
-          console.log message
           osb = ($ '#other-scrollback')
-          console.log osb
           dnotice = ($ "<p><b>#{message}</b></p><p></p>")
           osb.append dnotice
 
         disableInput = ->
-          console.log 'Disabling input.'
           ib = $('#input-box')
           ib.attr 'disabled', true
           otherbox.setBoxColor '#AAAAAA'
           ibb = ib.parent '.talkbox'
-          console.log 'Done disabling input.'
 
         enableInput = ->
-          console.log 'Enabling input.'
           ib = $('#input-box')
           ib.attr 'disabled', false
           otherbox.setBoxColor '#FFFFFF'
-          console.log 'Done enabling input.'
 
         handleUserDisconnect = (data) ->
           insertNotice 'User disconnected.'
@@ -104,8 +96,6 @@
           otherscrollback.scrollTop 9999999999
 
         sendJoin = (e) ->
-          if e?
-            console.log e
           roomJoinForm = ($ '#room-join')
           if roomJoinForm?
             room = roomJoinForm.children()[0].value
