@@ -1,5 +1,5 @@
 <div id="homehome">
-    <h1>s t a l k . i o</h1>
+    <h1>talk to . me</h1>
     <p>Enter a room name:</p>
     <form name="room-join" id="room-join">
     <input name="join-token" type="text" placeholder="Join Token" />
