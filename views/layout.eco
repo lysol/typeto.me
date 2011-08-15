@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>stalk.io</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Talk in actual real time." />
+    <link href='http://fonts.googleapis.com/css?family=Anonymous+Pro' rel='stylesheet' type='text/css'>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/diff_match_patch.js"></script>
+    <script src="/js/coffee-script.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script src="/js/jquery.color.js"></script>
+    <script type="text/coffeescript">
+        socket = null
+        lastInput = ""
+        dmp = new diff_match_patch()
+        waitingfor = true
+        talkbox = null
+        otherbox = null
+
+        $.prototype.setBoxColor = (color) ->
+          prop = backgroundColor: color
+          console.log "Setting #{@} to #{color}"
+          @animate prop, 200
+
+        sendBuffer = ->
+          curbuf = $('#input-box').val()
+          socket.emit 'resetBuffer',
+            currentBuffer: curbuf
+            token: '<%= @room %>'
+
+        handleResetBuffer = (data) ->
+          if data? and data.currentBuffer?
+            otherscrollback = ($ "#other-scrollback")
+            lines = otherscrollback.children()
+            cur = lines[lines.length - 1]
+            cur.textContent = data.currentBuffer
+
+        handlePartnerJoin = (data) ->
+          enableInput()
+          if waitingfor
+            osb = ($ '#other-scrollback')
+            osb.empty()
+            waitingfor = false
+          console.log osb 
+          insertNotice 'User connected.'
+          sendBuffer()
+
+        handleDenyJoin = ->
+          tb = ($ '#top-box')
+          bb = ($ '#bottom-box')
+          if tb?
+            tb.remove()
+          if bb?
+            bb.remove()
+          b = ($ 'body')
+          b.html '''
+            <p>This room is full. <a href="/">Try another</a></p>
+          '''
+
+        insertNotice = (message) ->
+          console.log message
+          osb = ($ '#other-scrollback')
+          console.log osb
+          dnotice = ($ "<p><b>#{message}</b></p><p></p>")
+          osb.append dnotice
+
+        disableInput = ->
+          console.log 'Disabling input.'
+          ib = $('#input-box')
+          ib.attr 'disabled', true
+          otherbox.setBoxColor '#AAAAAA'
+          ibb = ib.parent '.talkbox'
+          console.log 'Done disabling input.'
+
+        enableInput = ->
+          console.log 'Enabling input.'
+          ib = $('#input-box')
+          ib.attr 'disabled', false
+          otherbox.setBoxColor '#FFFFFF'
+          console.log 'Done enabling input.'
+
+        handleUserDisconnect = (data) ->
+          insertNotice 'User disconnected.'
+          disableInput()
+
+        doDiff = (val) ->
+          oldInput = lastInput
+          lastInput = val
+          res = dmp.patch_make(oldInput, val)
+          socket.emit 'diff', diff: res, token: '<%= @room %>'
+
+        handleNewline = ->
+          osb = ($ '#other-scrollback')
+          osb.append ($ '<p></p>')
+          osb.scrollTop 9999999999
+
+        handleDiff = (diff) ->
+          otherscrollback = ($ "#other-scrollback")
+          lines = otherscrollback.children()
+          old = lines[lines.length - 1]
+          res = dmp.patch_apply diff, old.textContent
+          old.textContent = res[0]
+          otherscrollback.scrollTop 9999999999
+
+        sendJoin = (e) ->
+          if e?
+            console.log e
+          roomJoinForm = ($ '#room-join')
+          if roomJoinForm?
+            room = roomJoinForm.children()[0].value
+            window.location = "/room/#{room}"
+          false
+
+
+        ($ document).ready () ->
+          socket = io.connect "http://<%= @config.publicHost %>:<%= @config.port %>"
+          socket.on 'joinResponse', (data) ->
+            handleJoinResponse data
+
+          socket.on 'partnerJoin', handlePartnerJoin
+          socket.on 'userDisconnect', handleUserDisconnect
+          socket.on 'denyJoin', handleDenyJoin 
+          socket.on 'newline', handleNewline
+          socket.on 'kick', (data) ->
+          socket.on 'resetBuffer', handleResetBuffer
+          socket.on 'diff', (data) -> handleDiff data.diff
+
+          <% if not @userPosition?: %>
+          roomJoinForm = ($ '#room-join')
+          rButton = ($ '#join-submit')
+          if roomJoinForm?
+            roomJoinForm.bind 'submit', sendJoin
+          if rButton?
+            rButton.bind 'click', sendJoin
+          roomJoinForm.submit = sendJoin
+          <% else: %>
+          if window.location.pathname.match '\/room\/'
+            if <%= @userPosition %> == 0
+              otherbox = ($ '#bottom-box')
+              talkbox = ($ '#top-box')
+              if not talkbox?
+                window.location = "/"
+            else if <%= @userPosition %> == 1
+              otherbox = ($ '#top-box')
+              talkbox = ($ '#bottom-box')
+            if not talkbox?
+              window.location = "/"
+            talkbox.html '''
+              <div class="scrollback" id="input-scrollback">
+              </div>
+              <input class="chat" id="input-box">
+              '''
+            ib = ($ "#input-box")
+            ib.keydown (ev) ->
+              keycode = ev.charCode || ev.keyCode
+              if keycode != 13
+                return true
+              ip = ($ '#input-scrollback')
+              p = $ '<p></p>'
+              ip.append p
+              c = ip.children()
+              p = c[c.length - 1]
+              p.textContent = ib.val()
+              ip.append p
+              ib.val ''
+              socket.emit 'newline', token: '<%= @room %>'
+              # Figure out how to get the proper height later.
+              ip.scrollTop 99999999
+
+
+            ib.keyup (ev) ->
+              doDiff ib.val()
+              true
+            otherbox.html '''
+              <div class="scrollback" id="other-scrollback">
+                  <p>Waiting for someone to join.</p>
+              </div>
+              '''
+            if <%= not @otherUserJoined %>
+              disableInput()
+            else
+              handlePartnerJoin()
+            talkbox.setBoxColor '#FFFFFF'
+            socket.emit 'requestJoin', token: '<%= @room %>'
+            <% end %>
+    </script>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Anonymous Pro', monospace;
+            position: relative;
+            font-size: 16px;
+        }
+        #container {
+            margin: auto;
+            margin-top: 5em;
+            width: 35em;
+        }
+        .talkbox {
+            padding: 3em;
+            border: 1px solid #000000;
+            height: 10em;
+            width: 35em;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #top-box {
+            border-bottom: 0;
+            webkit-border-top-left-radius: 5px;
+            webkit-border-top-right-radius: 5px;
+            moz-border-top-left-radius: 5px;
+            moz-border-top-right-radius: 5px;
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            background-color: #AAAAAA;
+        }
+        #bottom-box {
+            webkit-border-bottom-left-radius: 5px;
+            webkit-border-bottom-right-radius: 5px;
+            moz-border-bottom-left-radius: 5px;
+            moz-border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+            background-color: #AAAAAA;
+        }
+
+        .scrollback {
+            overflow: auto;
+            height: 9em;
+        }
+
+        #other-scrollback {
+            height: 10em;
+        }
+
+        .scrollback p {
+            margin: 0;
+        }
+
+        #input-box {
+            border: 1px solid #CCCCCC;
+            background-color: #FFFFFF;
+            width: 100%;
+            font-family: 'Anonymous Pro', monospace;
+            font-size: 16px;
+        }
+        #homehome {
+            margin: auto;
+            margin-top: 5em;
+            width: 20em;
+            height: 10em;
+        }
+    </style>
+  </head>
+<body>
+<%- @body %>
+</body>
+</html>

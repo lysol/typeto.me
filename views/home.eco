@@ -1,0 +1,8 @@
+<div id="homehome">
+    <h1>s t a l k . i o</h1>
+    <p>Enter a room name:</p>
+    <form name="room-join" id="room-join">
+    <input name="join-token" type="text" placeholder="Join Token" />
+    <button id="join-submit">Join</button>
+    </form>
+</div>

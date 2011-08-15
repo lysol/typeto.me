@@ -1,0 +1,8 @@
+<div id="container">
+    <h2>/room/<%= @room %></h2>
+    <div class="talkbox" id="top-box">
+    </div>
+    <div class="talkbox" id="bottom-box">
+        Waiting for someone else to join...
+    </div>
+</div>
