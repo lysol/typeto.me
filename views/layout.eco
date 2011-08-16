@@ -104,7 +104,11 @@
 
 
         ($ document).ready () ->
-          socket = io.connect "http://<%= @config.publicHost %>:<%= @config.port %>"
+          <% if @config.publicPort?: %>
+          socket = io.connect "http://<%= @config.publicHost %>:<%= @config.publicPort %>"
+          <% else: %>
+          socket = io.connect "http://<%= @config.publicHost %>"
+          <% end %>
           socket.on 'joinResponse', (data) ->
             handleJoinResponse data
 
@@ -116,7 +120,7 @@
           socket.on 'resetBuffer', handleResetBuffer
           socket.on 'diff', (data) -> handleDiff data.diff
 
-          <% if not @userPosition?: %>
+          <% if not @otherUserJoined?: %>
           roomJoinForm = ($ '#room-join')
           rButton = ($ '#join-submit')
           if roomJoinForm?
@@ -126,14 +130,10 @@
           roomJoinForm.submit = sendJoin
           <% else: %>
           if window.location.pathname.match '\/room\/'
-            if <%= @userPosition %> == 0
-              otherbox = ($ '#bottom-box')
-              talkbox = ($ '#top-box')
-              if not talkbox?
-                window.location = "/"
-            else if <%= @userPosition %> == 1
-              otherbox = ($ '#top-box')
-              talkbox = ($ '#bottom-box')
+            otherbox = ($ '#bottom-box')
+            talkbox = ($ '#top-box')
+            if not talkbox?
+              window.location = "/"
             if not talkbox?
               window.location = "/"
             talkbox.html '''
@@ -185,14 +185,13 @@
         }
         #container {
             margin: auto;
-            margin-top: 5em;
-            width: 35em;
+            margin-top: 2em;
+            width: 80%;
         }
         .talkbox {
             padding: 3em;
             border: 1px solid #000000;
             height: 10em;
-            width: 35em;
             margin-left: auto;
             margin-right: auto;
         }

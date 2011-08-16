@@ -71,10 +71,8 @@ app.get '/room/:token', (request, response) ->
   droom = getRoom token
   if not droom?
     rooms.push new Room 
-  uPos = if not droom? or not droom.top? then 0 else 1
   otherUserJoined = droom? and (droom.top? or droom.bottom?)
   response.render 'room',
-    userPosition: uPos
     "otherUserJoined": otherUserJoined
     room: token
     "config": config
