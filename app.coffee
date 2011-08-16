@@ -64,10 +64,7 @@ app.get '/:token', (request, response) ->
   if not droom?
     rooms.push new Room 
   otherUserJoined = droom? and (droom.top? or droom.bottom?)
-  if config.publicPort != 80
-    publicLink = "http://#{config.publicHost}:#{config.publicPort}/#{token}"
-  else
-    publicLink = "http://#{config.publicHost}/#{token}"
+  publicLink = "http://#{config.publicHost}/#{token}"
   response.render 'room',
     "otherUserJoined": otherUserJoined
     room: token
