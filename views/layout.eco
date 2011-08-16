@@ -95,11 +95,12 @@
           old.textContent = res[0]
           otherscrollback.scrollTop 9999999999
 
+        letters = 'abcdefghiklmnopqrstuvwxyz'
         sendJoin = (e) ->
-          roomJoinForm = ($ '#room-join')
-          if roomJoinForm?
-            room = roomJoinForm.children()[0].value
-            window.location = "/room/#{room}"
+          token = ''
+          for num in [1..10]
+            token += letters[Math.floor(Math.random() * letters.length)]
+          window.location = "/#{token}"
           false
 
 
@@ -120,60 +121,57 @@
           socket.on 'resetBuffer', handleResetBuffer
           socket.on 'diff', (data) -> handleDiff data.diff
 
-          <% if not @otherUserJoined?: %>
-          roomJoinForm = ($ '#room-join')
-          rButton = ($ '#join-submit')
-          if roomJoinForm?
-            roomJoinForm.bind 'submit', sendJoin
-          if rButton?
-            rButton.bind 'click', sendJoin
-          roomJoinForm.submit = sendJoin
+          <% if @home? and @home: %>
+          chatButton = ($ '#chat')
+          chatButton.bind 'click', sendJoin
           <% else: %>
-          if window.location.pathname.match '\/room\/'
-            otherbox = ($ '#bottom-box')
-            talkbox = ($ '#top-box')
-            if not talkbox?
-              window.location = "/"
-            if not talkbox?
-              window.location = "/"
-            talkbox.html '''
-              <div class="scrollback" id="input-scrollback">
-              </div>
-              <input class="chat" id="input-box">
-              '''
-            ib = ($ "#input-box")
-            ib.keydown (ev) ->
-              keycode = ev.charCode || ev.keyCode
-              if keycode != 13
-                return true
-              ip = ($ '#input-scrollback')
-              p = $ '<p></p>'
-              ip.append p
-              c = ip.children()
-              p = c[c.length - 1]
-              p.textContent = ib.val()
-              ip.append p
-              ib.val ''
-              socket.emit 'newline', token: '<%= @room %>'
-              # Figure out how to get the proper height later.
-              ip.scrollTop 99999999
+          otherbox = ($ '#bottom-box')
+          talkbox = ($ '#top-box')
+          if not talkbox?
+            window.location = "/"
+          if not talkbox?
+            window.location = "/"
+          talkbox.html '''
+            <div class="scrollback" id="input-scrollback">
+            </div>
+            <input class="chat" id="input-box">
+            '''
+          ib = ($ "#input-box")
+          ib.keydown (ev) ->
+            keycode = ev.charCode || ev.keyCode
+            if keycode != 13
+              return true
+            ip = ($ '#input-scrollback')
+            p = $ '<p></p>'
+            ip.append p
+            c = ip.children()
+            p = c[c.length - 1]
+            p.textContent = ib.val()
+            ip.append p
+            ib.val ''
+            socket.emit 'newline', token: '<%= @room %>'
+            # Figure out how to get the proper height later.
+            ip.scrollTop 99999999
 
 
-            ib.keyup (ev) ->
-              doDiff ib.val()
-              true
-            otherbox.html '''
-              <div class="scrollback" id="other-scrollback">
-                  <p>Waiting for someone to join.</p>
-              </div>
-              '''
-            if <%= not @otherUserJoined %>
-              disableInput()
-            else
-              handlePartnerJoin()
-            talkbox.setBoxColor '#FFFFFF'
-            socket.emit 'requestJoin', token: '<%= @room %>'
-            <% end %>
+          ib.keyup (ev) ->
+            doDiff ib.val()
+            true
+          otherbox.html '''
+            <div class="scrollback" id="other-scrollback">
+            <p>    
+            Give your friend this link:
+            <a href="<%= @publicLink %>"><%- @publicLink %></a>
+            </p>
+            </div>
+            '''
+          if <%= not @otherUserJoined %>
+            disableInput()
+          else
+            handlePartnerJoin()
+          talkbox.setBoxColor '#FFFFFF'
+          socket.emit 'requestJoin', token: '<%= @room %>'
+          <% end %>
     </script>
     <style type="text/css">
         body {
@@ -186,12 +184,12 @@
         #container {
             margin: auto;
             margin-top: 2em;
-            width: 80%;
+            width: 40em;
         }
         .talkbox {
             padding: 3em;
             border: 1px solid #000000;
-            height: 10em;
+            height: 13em;
             margin-left: auto;
             margin-right: auto;
         }
@@ -217,11 +215,11 @@
 
         .scrollback {
             overflow: auto;
-            height: 9em;
+            height: 12em;
         }
 
         #other-scrollback {
-            height: 10em;
+            height: 13em;
         }
 
         .scrollback p {
@@ -231,7 +229,7 @@
         #input-box {
             border: 1px solid #CCCCCC;
             background-color: #FFFFFF;
-            width: 100%;
+            width: 33em;
             font-family: 'Anonymous Pro', monospace;
             font-size: 16px;
         }
@@ -239,11 +237,32 @@
             margin: auto;
             margin-top: 5em;
             width: 20em;
+            text-align: center;
         }
-        
-        #current-rooms {
-            margin-top: 2em;
+        #homehome p {
+            padding-top: 1em;
         }
+        a#chat, a#chat:visited {
+            font-size: 1.5em;
+            color: #6E6E6E;
+            border: 1px solid #DCDCDC;
+            webkit-border-radius: 4px;
+            moz-border-radius: 4px;
+            border-radius: 4px;
+            padding: 0.75em;
+            padding-right: 0.85em;
+            padding-left: 0.85em;
+            background-color: #F3F3F3;
+            cursor: auto;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a#chat:hover {
+            border: 1px solid #989898;
+            color: #2A2A2A;
+        }
+
     </style>
   </head>
 <body>

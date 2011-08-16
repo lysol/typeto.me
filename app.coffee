@@ -7,7 +7,7 @@ eco = require 'eco'
 config = {}
 
 class Client
-  constructor: (@name, @socket) ->
+  constructor: (@socket) ->
 
   emit: (eventType, payload) -> @socket.emit eventType, payload
 
@@ -21,13 +21,6 @@ getRoom = (token) ->
   for room in rooms
     if room.token == token
       return room
-
-activeRooms = ->
-  erooms = []
-  for room in rooms
-    if room? and room.token? and (not room.top? or not room.bottom?)
-      erooms.push room
-  erooms
 
 roomRoute = (event, data, user) ->
   room = getRoom data.token
@@ -61,25 +54,25 @@ app.get '/', (request, response) ->
     token = request.query['join-token']
     response.redirect("http://#{config.publicHost}/room/#{token}", 303)
     return
-  currentRooms = activeRooms()
   response.render 'home',
     "config": config
-    "activeRooms": currentRooms
+    "home": true
 
-app.get '/room/:token', (request, response) ->
+app.get '/:token', (request, response) ->
   token = request.params.token
   droom = getRoom token
   if not droom?
     rooms.push new Room 
   otherUserJoined = droom? and (droom.top? or droom.bottom?)
+  if config.publicPort != 80
+    publicLink = "http://#{config.publicHost}:#{config.publicPort}/#{token}"
+  else
+    publicLink = "http://#{config.publicHost}/#{token}"
   response.render 'room',
     "otherUserJoined": otherUserJoined
     room: token
     "config": config
-
-app.get '/start', (request, response) ->
-
-randomName = -> 'Anonymous'
+    "publicLink": publicLink
 
 start = (err, data) ->
   if err?
@@ -92,7 +85,7 @@ start = (err, data) ->
     config.publicPort = 3000
   app.listen config.port, config.host
   io.sockets.on 'connection', (socket) ->
-    user = new Client(randomName(), socket)
+    user = new Client socket
     socket.on 'requestJoin', (data) ->
       if not (data? and data.token?)
         return
@@ -103,11 +96,11 @@ start = (err, data) ->
       if not room.top?
         room.top = user
         if room.bottom?
-          room.bottom.socket.emit 'partnerJoin', user.name
+          room.bottom.socket.emit 'partnerJoin', ''
       else if not room.bottom?
         room.bottom = user
         if room.top?
-          room.top.socket.emit 'partnerJoin', user.name
+          room.top.socket.emit 'partnerJoin', ''
       else
         socket.emit 'denyJoin', data.token
 
