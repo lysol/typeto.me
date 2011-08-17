@@ -3,6 +3,6 @@
     </div>
     <div class="talkbox" id="bottom-box">
         Give your friend this link:
-        <a href="<%= @publicLink %>"><%- @publicLink %></a>
+        <a id="publiclink" href="<%= @publicLink %>"><%- @publicLink %></a> <a href="#" id="copy-publiclink">[copy]</a>
     </div>
 </div>
