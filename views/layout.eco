@@ -53,7 +53,7 @@
             bb.remove()
           b = ($ 'body')
           b.html '''
-            <p>This room is full. <a href="/">Try another</a></p>
+            <p>Two people are already talking here. Did someone forget to close a window?<p><p><a href="/">Try starting a new chat.</a></p>
           '''
 
         removeCurrentLineClass = (scrollbackElem) ->
