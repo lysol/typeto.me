@@ -31,10 +31,8 @@ roomRoute = (event, data, user) ->
     return
   if room.top == user and room.bottom? and room.bottom.socket?
     room.bottom.socket.emit event, data
-    console.log "top == user"
   else if room.top? and room.top.socket?
     room.top.socket.emit event, data
-    console.log "bottom == user"
 
 
 # Setup Template Engine
@@ -79,7 +77,7 @@ start = (err, data) ->
   if not config.publicHost?
     config.publicHost = 'localhost'
   if not config.publicPort?
-    config.publicPort = 3000
+    config.publicPort = 80
   app.listen config.port, config.host
   io.sockets.on 'connection', (socket) ->
     user = new Client socket
@@ -112,9 +110,6 @@ start = (err, data) ->
       roomRoute 'diff', data, user
 
     socket.on 'resetBuffer', (data) ->
-      console.log 'Received resetBuffer'
-      console.log data
-
       if not (data? and data.currentBuffer? and data.token?)
         return
       roomRoute 'resetBuffer', data, user

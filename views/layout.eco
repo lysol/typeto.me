@@ -97,7 +97,6 @@
           osb.scrollTop 9999999999
 
         diffBox = (diff, scrollback=($ "#other-scrollback")) ->
-          console.log scrollback
           lines = scrollback.children()
           old = lines[lines.length - 1]
           res = dmp.patch_apply diff, old.textContent
