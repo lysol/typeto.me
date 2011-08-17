@@ -3,5 +3,5 @@
     <p>
     <a href="/" id="chat">Chat now!</a>
     </p>
-<br /><br /><br /><br />Works in webkit browsers (Chrome, Safari); Firefox (and IE?) support coming soon.
+<br /><br /><br /><br />Works in Chrome and Safari<br />Firefox (and IE?) coming soon.
 </div>
