@@ -10,6 +10,16 @@
     <script src="/js/coffee-script.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script src="/js/jquery.color.js"></script>
+    <script type="text/javascript" src="/js/jquery.zclip.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+
+	    $('a#copy-publiclink').zclip({
+	        path:'/js/ZeroClipboard.swf',
+	        copy:$('p#publiclink').text()
+	    });
+	});
+	</script>
     <script type="text/coffeescript">
         socket = null
         lastInput = ""
@@ -171,7 +181,8 @@
             <div class="scrollback" id="other-scrollback">
             <p>    
             Give your friend this link:
-            <a href="<%= @publicLink %>"><%- @publicLink %></a>
+<a id="publiclink" href="<%= @publicLink %>"><%- @publicLink %></a> <a href="#" id="copy-publiclink">[copy]</a>
+
             </p>
             </div>
             '''
