@@ -70,7 +70,7 @@
         disableInput = ->
           ib = $('#input-box')
           ib.attr 'disabled', true
-          otherbox.setBoxColor '#AAAAAA'
+          otherbox.setBoxColor '#DDDDDD'
           ibb = ib.parent '.talkbox'
 
         enableInput = ->
@@ -210,7 +210,7 @@
             moz-border-top-right-radius: 5px;
             border-top-right-radius: 5px;
             border-top-left-radius: 5px;
-            background-color: #AAAAAA;
+            background-color: #DDDDDD;
             position: relative;
         }
         #bottom-box {
@@ -220,7 +220,7 @@
             moz-border-bottom-right-radius: 5px;
             border-bottom-right-radius: 5px;
             border-bottom-left-radius: 5px;
-            background-color: #AAAAAA;
+            background-color: #DDDDDD;
         }
 
         .scrollback {
