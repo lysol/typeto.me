@@ -1,19 +1,8 @@
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jquery.zclip.js"></script>
-<script type="text/javascript">
-$(document).ready(function(){
-
-    $('a#copy-publiclink').zclip({
-        path:'js/ZeroClipboard.swf',
-        copy:$('p#publiclink').text()
-    });
-});
-</script>
 <div id="container">
     <div class="talkbox" id="top-box">
     </div>
     <div class="talkbox" id="bottom-box">
         Give your friend this link:
-        <a id="publiclink" href="<%= @publicLink %>"><%- @publicLink %></a> <a href="#" id="copy-publiclink">[copy]</div>
+        <a href="<%= @publicLink %>"><%- @publicLink %></a>
     </div>
 </div>
