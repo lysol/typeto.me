@@ -16,7 +16,7 @@
 
 	    $('a#copy-publiclink').zclip({
 	        path:'/js/ZeroClipboard.swf',
-	        copy:$('p#publiclink').text()
+	        copy:$('a#publiclink').text()
 	    });
 	});
 	</script>
