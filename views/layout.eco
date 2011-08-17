@@ -22,6 +22,9 @@
           prop = backgroundColor: color
           @animate prop, 200
 
+        $.prototype.scrollBottom = ->
+          @[0].scrollTop = @[0].scrollHeight
+
         sendBuffer = ->
           curbuf = $('#input-box').val()
           socket.emit 'resetBuffer',
@@ -94,14 +97,14 @@
           osb = ($ '#other-scrollback')
           removeCurrentLineClass osb
           osb.append ($ '<p class="current-line"></p>')
-          osb.scrollTop 9999999999
+          osb.scrollBottom()
 
         diffBox = (diff, scrollback=($ "#other-scrollback")) ->
           lines = scrollback.children()
           old = lines[lines.length - 1]
           res = dmp.patch_apply diff, old.textContent
           old.textContent = res[0]
-          scrollback.scrollTop 9999999999
+          scrollback.scrollBottom()
 
         handleDiff = (diff) -> diffBox diff
 
@@ -158,8 +161,7 @@
             ip.append p
             ib.val ''
             socket.emit 'newline', token: '<%= @room %>'
-            # Figure out how to get the proper height later.
-            ip.scrollTop 99999999
+            ip.scrollBottom()
 
 
           ib.keyup (ev) ->
@@ -198,7 +200,8 @@
         .talkbox {
             padding: 3em;
             border: 1px solid #000000;
-            height: 13em;
+            height: 14.3em;
+            padding-top: 2em;
             margin-left: auto;
             margin-right: auto;
         }
@@ -225,11 +228,11 @@
 
         .scrollback {
             overflow: auto;
-            height: 12em;
+            height: 14.8375em;
         }
 
         #other-scrollback {
-            height: 13em;
+            height: 15.8375em;
         }
 
         .scrollback p {
