@@ -181,7 +181,7 @@
             <div class="scrollback" id="other-scrollback">
             <p>    
             Give your friend this link:
-<a id="publiclink" href="<%= @publicLink %>"><%- @publicLink %></a> <a href="#" id="copy-publiclink">[copy]</a>
+<a id="publiclink" href="<%= @publicLink %>"><%- @publicLink %></a> <!-- <a href="#" id="copy-publiclink">[copy]</a> -->
 
             </p>
             </div>
