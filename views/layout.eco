@@ -310,7 +310,7 @@
         #homehome {
             margin: auto;
             margin-top: 5em;
-            width: 20em;
+            width: 25em;
             text-align: center;
         }
         #homehome p {
@@ -330,6 +330,10 @@
             cursor: auto;
             text-decoration: none;
             font-weight: bold;
+            display: block;
+            clear: both;
+            width: 5em;
+            margin: auto;
         }
 
         a#chat:hover {

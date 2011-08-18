@@ -1,7 +1,9 @@
 <div id="homehome">
     <h1>type to . me</h1>
     <p>
-    <a href="/" id="chat">Chat now!</a>
+    <a href="/" id="chat">Chat now!</a><br />
+    <small>IE versions &lt;=8 are unsupported at this time.</small>
     </p>
-<br /><br /><br /><br /><a href="https://github.com/lysol/typeto.me/">help us code</a>
+    <p>
+    <a href="https://github.com/lysol/typeto.me/">help us code</a>
 </div>
