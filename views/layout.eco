@@ -9,17 +9,8 @@
     <script src="/js/diff_match_patch.js"></script>
     <script src="/js/coffee-script.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-    <script src="/js/jquery.color.js"></script>
+    <script type="text/javascript" src="/js/jquery.color.js"></script>
     <script type="text/javascript" src="/js/jquery.zclip.min.js"></script>
-	<script type="text/javascript">
-	$(document).ready(function(){
-
-	    $('a#copy-publiclink').zclip({
-	        path:'/js/ZeroClipboard.swf',
-	        copy:$('a#publiclink').text()
-	    });
-	});
-	</script>
     <script type="text/coffeescript">
         socket = null
         lastInput = ""
@@ -27,6 +18,7 @@
         waitingfor = true
         talkbox = null
         otherbox = null
+        inputmax = 60
 
         $.prototype.setBoxColor = (color) ->
           prop = backgroundColor: color
@@ -34,6 +26,15 @@
 
         $.prototype.scrollBottom = ->
           @[0].scrollTop = @[0].scrollHeight
+
+        drainBuffer = ->
+          ib = ($ '#input-box')
+          ip = ($ '#input-scrollback')
+          p = $ "<p>#{ib.val()}</p>"
+          p.insertBefore $('#input-box')
+          ib.val ''
+          socket.emit 'newline', token: '<%= @room %>'
+          ip.scrollBottom()
 
         sendBuffer = ->
           curbuf = $('#input-box').val()
@@ -58,8 +59,8 @@
           sendBuffer()
 
         handleDenyJoin = ->
-          tb = ($ '#top-box')
-          bb = ($ '#bottom-box')
+          tb = ($ '#you-box')
+          bb = ($ '#them-box')
           if tb?
             tb.remove()
           if bb?
@@ -82,23 +83,37 @@
 
         disableInput = ->
           ib = $('#input-box')
+          ib[0].blur()
           ib.attr 'disabled', true
           otherbox.setBoxColor '#DDDDDD'
+          ib.attr 'placeholder', 'Waiting for a friend to come back.'
           ibb = ib.parent '.talkbox'
 
         enableInput = ->
           ib = $('#input-box')
           ib.attr 'disabled', false
           otherbox.setBoxColor '#FFFFFF'
+          ib.attr 'placeholder', 'Just start typing.'
           ib[0].focus()
 
         handleUserDisconnect = (data) ->
           insertNotice 'User disconnected.'
           disableInput()
 
+        forceSend = ->
+          ib = $ '#input-box'
+          words = ib.val().split ' '
+          ib.val words[0..words.length - 2].join ' '
+          drainBuffer()
+          if words.length > 1
+            ib.val words[words.length - 1]
+
+
         doDiff = (val) ->
           oldInput = lastInput
           lastInput = val
+          if oldInput == lastInput
+            return
           res = dmp.patch_make(oldInput, val)
           socket.emit 'diff', diff: res, token: '<%= @room %>'
           #diffBox res, ($ '#input-scrollback')
@@ -157,17 +172,17 @@
           chatButton = ($ '#chat')
           chatButton.bind 'click', sendJoin
           <% else: %>
-          otherbox = ($ '#bottom-box')
-          talkbox = ($ '#top-box')
+          otherbox = ($ '#them-box')
+          talkbox = ($ '#you-box')
           if not talkbox?
             window.location = "/"
           if not talkbox?
             window.location = "/"
-          talkbox.html '''
+          talkbox.html """
             <div class="scrollback" id="input-scrollback">
-            <input class="chat" placeholder="Just start typing." id="input-box">
+                <input maxlength="#{inputmax}" class="chat" placeholder="Waiting for your friend to arrive." id="input-box">
             </div>
-            '''
+            """
           ib = ($ "#input-box")
           ib.data 'focused', false
           ib.keydown (ev) ->
@@ -176,12 +191,7 @@
               if ev.target == @
                 return true
               return false
-            ip = ($ '#input-scrollback')
-            p = $ "<p>#{ib.val()}</p>"
-            p.insertBefore $('#input-box')
-            ib.val ''
-            socket.emit 'newline', token: '<%= @room %>'
-            ip.scrollBottom()
+            drainBuffer()
             if ev.target == @
               return true
             return false
@@ -192,22 +202,29 @@
           ib.blur (ev) ->
             $(@).data 'focused', false
 
-          ib.keyup (ev) ->
+          ib.bind 'keyup change', (ev) ->
             doDiff ib.val()
+            if ib.val().length >= inputmax
+              forceSend()
             true
 
           otherbox.html '''
             <div class="scrollback" id="other-scrollback">
-            <p>    
+            <p>
             Give your friend this link:
 <a id="publiclink" href="<%= @publicLink %>"><%- @publicLink %></a> <!-- <a href="#" id="copy-publiclink">[copy]</a> -->
 
             </p>
             </div>
             '''
-          if <%= not @otherUserJoined %>
-            disableInput()
-          else
+
+          # Set up the copy-to-clipboard chat link
+          # zclipOptions =
+          #   path: '/js/ZeroClipboard.swf'
+          #   copy: ($ 'a#publiclink').text()
+          # ($ 'a#copy-publiclink').live 'zclip', zclipOptions
+
+          if <%= @otherUserJoined %>
             handlePartnerJoin()
           talkbox.setBoxColor '#FFFFFF'
           socket.emit 'requestJoin', token: '<%= @room %>'
@@ -235,7 +252,7 @@
             margin-left: auto;
             margin-right: auto;
         }
-        #top-box {
+        #them-box {
             border-bottom: 0;
             webkit-border-top-left-radius: 5px;
             webkit-border-top-right-radius: 5px;
@@ -246,7 +263,7 @@
             background-color: #DDDDDD;
             position: relative;
         }
-        #bottom-box {
+        #you-box {
             webkit-border-bottom-left-radius: 5px;
             webkit-border-bottom-right-radius: 5px;
             moz-border-bottom-left-radius: 5px;
@@ -272,14 +289,15 @@
         #input-box {
             border: 0 #FFFFFF solid;
             background-color: #FFFFFF;
-            width: 84.5%;
+            width: 100%;
             font-family: 'Anonymous Pro', monospace;
             font-size: 16px;
             bottom: 1em;
             left: auto;
             color: #000000;
+            wrap: physical;
         }
-        
+
         #input-box:focus {
             outline: none;
         }
@@ -320,7 +338,6 @@
         }
 
         p.current-line {
-            color: #3333FF;
             border-right: 1px solid #000000;
             display: inline;
             clear: both;
