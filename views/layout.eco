@@ -18,7 +18,7 @@
         waitingfor = true
         talkbox = null
         otherbox = null
-        inputmax = 60
+        inputmax = 58
 
         $.prototype.setBoxColor = (color) ->
           prop = backgroundColor: color
@@ -284,18 +284,21 @@
 
         .scrollback p {
             margin: 0;
+            padding-left: 1px;
+            padding-top: 2px;
         }
 
         #input-box {
             border: 0 #FFFFFF solid;
             background-color: #FFFFFF;
-            width: 100%;
+            width: 99%;
             font-family: 'Anonymous Pro', monospace;
             font-size: 16px;
             bottom: 1em;
             left: auto;
             color: #000000;
             wrap: physical;
+            outline: none;
         }
 
         #input-box:focus {
@@ -338,7 +341,6 @@
         }
 
         p.current-line {
-            border-right: 1px solid #000000;
             display: inline;
             clear: both;
         }
