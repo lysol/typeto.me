@@ -34,6 +34,7 @@
           p.text ib.val()
           p.insertBefore $('#input-box')
           ib.val ''
+          lastInput = ""
           socket.emit 'newline', token: '<%= @room %>'
           ip.scrollBottom()
 
@@ -105,10 +106,11 @@
           ib = $ '#input-box'
           words = ib.val().split ' '
           ib.val words[0..words.length - 2].join ' '
+          doDiff ib.val()
           drainBuffer()
           if words.length > 1
             ib.val words[words.length - 1]
-
+          doDiff ib.val()
 
         doDiff = (val) ->
           oldInput = lastInput
@@ -332,7 +334,7 @@
             font-weight: bold;
             display: block;
             clear: both;
-            width: 5em;
+            width: 6.5em;
             margin: auto;
         }
 
