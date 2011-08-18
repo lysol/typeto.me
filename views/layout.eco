@@ -90,7 +90,7 @@
           ib = $('#input-box')
           ib.attr 'disabled', false
           otherbox.setBoxColor '#FFFFFF'
-          ib.focus()
+          ib[0].focus()
 
         handleUserDisconnect = (data) ->
           insertNotice 'User disconnected.'
@@ -126,6 +126,15 @@
           window.location = "/#{token}"
           false
 
+        ($ document).keydown (ev) ->
+          if ev.target == @ or (ev.ctrlKey? and ev.ctrlKey)
+            return true
+          ibfocused = $('#input-box').data 'focused'
+          if not ibfocused? or not ibfocused
+            ($ '#input-box').focus()
+            doitman = -> $('#input-box').trigger ev
+            setTimeout doitman, 100
+          return true
 
         ($ document).ready () ->
           <% if @config.publicPort?: %>
@@ -161,10 +170,13 @@
             <input class="chat" placeholder="Type here" id="input-box">
             '''
           ib = ($ "#input-box")
+          ib.data 'focused', false
           ib.keydown (ev) ->
             keycode = ev.charCode || ev.keyCode
             if keycode != 13
-              return true
+              if ev.target == @
+                return true
+              return false
             ip = ($ '#input-scrollback')
             removeCurrentLineClass ip
             p = $ '<p class="current-line"></p>'
@@ -172,11 +184,20 @@
             ib.val ''
             socket.emit 'newline', token: '<%= @room %>'
             ip.scrollBottom()
+            if ev.target == @
+              return true
+            return false
 
+          ib.focus (ev) ->
+            $(@).data 'focused', true
+
+          ib.blur (ev) ->
+            $(@).data 'focused', false
 
           ib.keyup (ev) ->
             doDiff ib.val()
             true
+
           otherbox.html '''
             <div class="scrollback" id="other-scrollback">
             <p>    
@@ -251,15 +272,18 @@
         }
 
         #input-box {
-            border: 1px solid #DCDCDC;
+            /*border: 1px solid #DCDCDC;
             background-color: #FFFFFF;
             width: 84.5%;
             font-family: 'Anonymous Pro', monospace;
             font-size: 80%;
-            position: absolute;
             bottom: 1em;
             left: auto;
             color: #6E6E6E;
+            */
+            position: absolute;
+            top: -100em;
+
         }
         #homehome {
             margin: auto;
@@ -298,6 +322,9 @@
 
         p.current-line {
             color: #3333FF;
+            border-right: .5em solid #3333FF;
+            display: inline;
+            clear: both;
         }
 
     </style>
