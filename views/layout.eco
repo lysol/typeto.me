@@ -186,6 +186,7 @@
             """
           ib = ($ "#input-box")
           ib.data 'focused', false
+          ib.attr 'disabled', true
           ib.keydown (ev) ->
             keycode = ev.charCode || ev.keyCode
             if keycode != 13
