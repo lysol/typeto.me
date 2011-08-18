@@ -30,7 +30,8 @@
         drainBuffer = ->
           ib = ($ '#input-box')
           ip = ($ '#input-scrollback')
-          p = $ "<p>#{ib.val()}</p>"
+          p = $ "<p></p>"
+          p.text ib.val()
           p.insertBefore $('#input-box')
           ib.val ''
           socket.emit 'newline', token: '<%= @room %>'
@@ -338,11 +339,6 @@
         .notice {
             font-weight: bold;
             color: #AFAFAF;
-        }
-
-        p.current-line {
-            display: inline;
-            clear: both;
         }
 
     </style>
