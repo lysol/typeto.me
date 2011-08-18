@@ -50,7 +50,7 @@ app.use express.static __dirname + '/public'
 app.get '/', (request, response) ->
   if request.query? and request.query['join-token']?
     token = request.query['join-token']
-    response.redirect("http://#{config.publicHost}/room/#{token}", 303)
+    response.redirect("http://#{config.publicHost}/#{token}", 303)
     return
   response.render 'home',
     "config": config
