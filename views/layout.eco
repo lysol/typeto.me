@@ -10,7 +10,6 @@
     <script src="/js/coffee-script.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script type="text/javascript" src="/js/jquery.color.js"></script>
-    <script type="text/javascript" src="/js/jquery.zclip.min.js"></script>
     <script type="text/coffeescript">
         socket = null
         lastInput = ""
@@ -34,6 +33,7 @@
           p.text ib.val()
           p.insertBefore $('#input-box')
           ib.val ''
+          lastInput = ""
           socket.emit 'newline', token: '<%= @room %>'
           ip.scrollBottom()
 
@@ -105,10 +105,11 @@
           ib = $ '#input-box'
           words = ib.val().split ' '
           ib.val words[0..words.length - 2].join ' '
+          doDiff ib.val()
           drainBuffer()
           if words.length > 1
             ib.val words[words.length - 1]
-
+          doDiff ib.val()
 
         doDiff = (val) ->
           oldInput = lastInput
@@ -220,12 +221,6 @@
             </div>
             '''
 
-          # Set up the copy-to-clipboard chat link
-          # zclipOptions =
-          #   path: '/js/ZeroClipboard.swf'
-          #   copy: ($ 'a#publiclink').text()
-          # ($ 'a#copy-publiclink').live 'zclip', zclipOptions
-
           if <%= @otherUserJoined %>
             handlePartnerJoin()
           talkbox.setBoxColor '#FFFFFF'
@@ -332,7 +327,7 @@
             font-weight: bold;
             display: block;
             clear: both;
-            width: 5em;
+            width: 6.5em;
             margin: auto;
         }
 
