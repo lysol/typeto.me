@@ -182,7 +182,7 @@
             window.location = "/"
           talkbox.html """
             <div class="scrollback" id="input-scrollback">
-                <input maxlength="#{inputmax}" class="chat" placeholder="Waiting for your friend to arrive." id="input-box">
+                <input class="chat" placeholder="Waiting for your friend to arrive." id="input-box">
             </div>
             """
           ib = ($ "#input-box")
