@@ -345,11 +345,11 @@
   </head>
 <body>
 <%- @body %>
-
+<% if @config? and @config.analyticsCode?: %>
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-658194-19']);
+  _gaq.push(['_setAccount', '<%= @config.analyticsCode %>']);
   _gaq.push(['_trackPageview']);
 
   (function() {
@@ -359,5 +359,6 @@
   })();
 
 </script>
+<% end %>
 </body>
 </html>
