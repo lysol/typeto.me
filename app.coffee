@@ -1,6 +1,8 @@
 express = require 'express'
 app = module.exports = express.createServer()
 io = (require 'socket.io').listen(app)
+console.log io
+io.settings['log level'] = 1
 fs = require 'fs'
 eco = require 'eco'
 
@@ -34,6 +36,10 @@ roomRoute = (event, data, user) ->
   else if room.top? and room.top.socket?
     room.top.socket.emit event, data
 
+pruneRooms = ->
+  for i in [(rooms.length - 1)..0]
+    if rooms[i]? and not (rooms[i].top? or rooms[i].bottom?)
+      rooms.splice i, 1
 
 # Setup Template Engine
 app.set 'views', __dirname + '/views'
@@ -55,6 +61,17 @@ app.get '/', (request, response) ->
   response.render 'home',
     "config": config
     "home": true
+
+app.get '/status', (request, response) ->
+  pruneRooms()
+  payload = {}
+  payload.userCount = 0
+  payload.activeRooms = rooms.length
+  for room in rooms
+    payload.userCount += room.top? + room.bottom?
+  response.contentType 'application/json'
+  response.write JSON.stringify payload
+  response.end()
 
 app.get '/:token', (request, response) ->
   token = request.params.token
@@ -132,6 +149,7 @@ start = (err, data) ->
             room.bottom = null
           else
             rooms.splice i, 1
+      pruneRooms()
 
   console.log "Listening on #{config.host}:#{config.port}"
 fs.readFile __dirname + '/config.json', 'utf8', start
