@@ -11,3 +11,10 @@ This is made possible via [socket.io](http://socket.io) and Google's [js diff li
 Derek did all the work; [Daniel](http://3e.org/dmd/) nagged him to do it.
 
 [See it live](http://typeto.me/)
+
+NOTE: Ensure that you are using an up-to-date version of Node.js, socket.io, and ideally, all related modules:
+
+* socket.io
+* coffee-script
+* eco
+* express
