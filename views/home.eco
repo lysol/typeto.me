@@ -2,7 +2,9 @@
     <h1>type to . me</h1>
     <p>
     <a href="/" id="chat">Chat now!</a><br />
-    <small>IE versions &lt;=8 are unsupported at this time.</small>
+    <!--[if lte IE 8]>
+    <big><font color=red>IE versions &lt;=8 are unsupported at this time.</font></big>
+    <![endif]-->
     </p>
     <p>
     <a href="https://github.com/lysol/typeto.me/">typeto.me @ github</a><br />
