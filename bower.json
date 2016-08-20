@@ -1,0 +1,25 @@
+{
+  "name": "typeto.me",
+  "version": "0.2.0",
+  "homepage": "https://github.com/lysol/typeto.me",
+  "authors": [
+    "derek arnold and jordan byrd"
+  ],
+  "description": "realtime chat toy",
+  "main": "app.js",
+  "keywords": [
+    "chat"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "socket.io-client": "~1.4.8"
+  }
+}
