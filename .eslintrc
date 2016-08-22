@@ -1,0 +1,38 @@
+{
+    "parser": "babel-eslint",
+    "rules": {
+        "indent": [
+            1,
+            4 
+        ],
+        "quotes": [
+            2,
+            "single"
+        ],
+        "linebreak-style": [
+            2,
+            "unix"
+        ],
+        "semi": [
+            2,
+            "always"
+        ],
+        "eol-last": 1,
+        "dot-notation": 0,
+        "no-console": 1,
+        "comma-dangle": 2,
+        "no-dupe-keys": 2,
+        "no-eq-null": 0,
+        "no-eval": 2,
+        "no-unused-vars": [2, {"vars": "all", "args": "after-used"}],
+        "func-style": [2, "expression"]
+ 
+    },
+    "env": {
+        "browser": true
+    },
+    "globals": {
+        "angular": true,
+        "_": true
+    }
+}
